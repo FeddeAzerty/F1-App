@@ -1,0 +1,27 @@
+# --- Secrets / env ---
+.env
+.env.local
+.env.*.local
+
+# --- Python (backend) ---
+backend/.venv/
+backend/venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+
+# --- Flutter / Dart (mobile_app) ---
+# mobile_app/ also has its own generated .gitignore; these are belt-and-braces.
+mobile_app/build/
+mobile_app/.dart_tool/
+mobile_app/.flutter-plugins
+mobile_app/.flutter-plugins-dependencies
+**/*.g.dart.lock
+
+# --- Tooling / editors / OS ---
+.claude/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
