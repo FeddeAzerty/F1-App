@@ -1,6 +1,6 @@
 # F1 Portfolio App
 
-A full-stack Formula 1 app (Android, iOS, Windows, macOS): race schedule,
+A full stack Formula 1 app (Android, iOS, Windows, macOS): race schedule,
 results, and standings pulled from the
 [Jolpica F1 API](https://api.jolpi.ca/ergast/f1/) and cached in Postgres,
 plus live F1 news and links to official ticket vendors.
@@ -11,45 +11,25 @@ plus live F1 news and links to official ticket vendors.
 - **Database:** PostgreSQL, run locally via Docker Compose
 - **App:** Flutter (Android, iOS, Windows, macOS) — `mobile_app/`
 - **Data sources:**
-  - [Jolpica F1 API](https://api.jolpi.ca/ergast/f1/) — the free, open-source
+  - [Jolpica F1 API](https://api.jolpi.ca/ergast/f1/): the free, open-source
     successor to the deprecated Ergast API (schedule, results, standings)
-  - [Wikipedia REST API](https://en.wikipedia.org/api/rest_v1/) — driver photos
-  - [motorsport.com RSS](https://www.motorsport.com/rss/f1/news/) — news (no key)
-  - [f1db/f1db](https://github.com/f1db/f1db) (CC BY 4.0) — track outline diagrams
+  - [Wikipedia REST API](https://en.wikipedia.org/api/rest_v1/):driver photos
+  - [motorsport.com RSS](https://www.motorsport.com/rss/f1/news/): news (no key)
+  - [f1db/f1db](https://github.com/f1db/f1db) (CC BY 4.0): track outline diagrams
 
 ## Features
 
-- **Home** — live next-race countdown, your favourited drivers, upcoming races
-- **Schedule** — season browser with a card grid (podium preview / session times,
+- **Home**: live next-race countdown, your favourited drivers, upcoming races
+- **Schedule**: season browser with a card grid (podium preview / session times,
   next race highlighted) and a results-table view
-- **Race detail** — track outline diagram (theme-aware), live circuit map, weekend
+- **Race detail**:track outline diagram (theme-aware), live circuit map, weekend
   session schedule, full results with team-colour accents and fastest lap, or
   "at this circuit" history (last winner + fastest lap) for upcoming races
-- **Standings** — drivers / teams tables, plus a season progression line chart
-- **Driver & team pages** — bio, career stats, recent results, favourite toggle
-- **News** — live F1 headlines with images
-- **Tickets** — outbound links to official vendors
+- **Standings**: drivers / teams tables, plus a season progression line chart
+- **Driver & team pages**:bio, career stats, recent results, favourite toggle
+- **News**: live F1 headlines with images
+- **Tickets**: outbound links to official vendors
 - **Light / dark theme** toggle throughout
-
-## ⚠️ Known limitation: Jolpica reliability
-
-Jolpica is a **free, volunteer-run project** with no uptime SLA and a
-**200 requests/hour** rate limit. It can be slow or briefly unavailable.
-This app is built around that constraint:
-
-- Every Jolpica response is cached in the `jolpica_cache` Postgres table
-  (see `backend/app/services/jolpica/client.py`) with a configurable TTL
-  (`JOLPICA_CACHE_TTL_SECONDS`, default 1 hour), so repeated requests are
-  served from our own database instead of hitting Jolpica every time.
-- Parsed data is also upserted into normalized tables (`races`, `drivers`,
-  `constructors`, `race_results`, `driver_standings`, `constructor_standings`)
-  so the app has something to show even if a sync temporarily fails.
-- The Flutter app's screens catch fetch failures and show a friendly
-  message rather than crashing if the API (or Jolpica) is briefly
-  unreachable (see the `LoadStatus.error` branch in `home_screen.dart`).
-
-If you're relying on this for anything time-sensitive, don't — treat it as
-a best-effort data source, per Jolpica's own project stance.
 
 ## Project structure
 
@@ -97,7 +77,7 @@ cp .env.example .env
 This root `.env` is read by both `docker-compose.yml` (Postgres credentials)
 and the FastAPI backend (DB connection string, Jolpica config, and
 placeholders for future API keys). The Flutter app doesn't need an env
-file — its backend URL is resolved in code (see step 4 below).
+file its backend URL is resolved in code (see step 4 below).
 
 ### 2. Start Postgres
 
@@ -147,21 +127,14 @@ The backend URL is resolved automatically in
 - **Android emulator:** the emulator's `localhost` refers to itself, not
   your machine — the app automatically uses `http://10.0.2.2:8000` instead
   (a special alias the Android emulator provides for the host machine).
-- **Physical device:** neither of the above reaches your dev machine.
-  Override with your machine's LAN IP:
-  ```bash
-  flutter run --dart-define=API_BASE_URL=http://192.168.1.23:8000
-  ```
 
 > **Note:** the app needs the backend running to show data. If every screen
 > shows "Couldn't load this", check that `uvicorn` is up on port 8000 and
 > that Postgres is running (`docker compose ps`).
 
-## Deploying the backend (free)
 
-The Flutter app is only a UI — it needs this API reachable to show anything.
-To hand someone a build that works without them running a server, deploy the
-backend and point the app at that URL.
+
+
 
 Recommended free combination:
 
