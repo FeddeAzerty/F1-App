@@ -3,7 +3,7 @@
 A full-stack Formula 1 app (Android, iOS, Windows, macOS): race schedule,
 results, and standings pulled from the
 [Jolpica F1 API](https://api.jolpi.ca/ergast/f1/) and cached in Postgres,
-plus a news placeholder and static ticket links.
+plus live F1 news and links to official ticket vendors.
 
 ## Stack
 
@@ -30,11 +30,6 @@ plus a news placeholder and static ticket links.
 - **News** — live F1 headlines with images
 - **Tickets** — outbound links to official vendors
 - **Light / dark theme** toggle throughout
-
-> **Note:** an earlier Next.js web frontend lives in `frontend-legacy/`,
-> retired in favor of the Flutter app. It's untouched and still builds/runs
-> (`npm install && npm run dev`) but isn't part of the active project
-> anymore — safe to delete once you're sure you don't need it for reference.
 
 ## ⚠️ Known limitation: Jolpica reliability
 
@@ -71,15 +66,18 @@ F1Project/
 │       ├── routers/           # FastAPI routes
 │       └── services/
 │           ├── jolpica/       # Jolpica HTTP client + cache + sync-to-DB logic
+│           ├── news/          # F1 news RSS client (no API key needed)
+│           ├── wikipedia/     # Driver photo resolution
 │           └── sportradar/    # Placeholder module for future Sportradar integration (not implemented)
-├── mobile_app/                # Flutter app (Android, iOS, Windows, macOS)
-│   └── lib/
-│       ├── models/            # Dart classes mirroring backend Pydantic schemas
-│       ├── services/          # ApiClient — http calls to the FastAPI backend
-│       ├── providers/         # ChangeNotifier state (Provider package)
-│       ├── screens/           # Home, Schedule, Standings, News, Tickets
-│       └── widgets/           # AdaptiveNavScaffold, shared UI pieces
-└── frontend-legacy/           # Retired Next.js web frontend, kept for reference
+└── mobile_app/                # Flutter app (Android, iOS, Windows, macOS)
+    ├── assets/circuits/       # Track outline SVGs (light + dark variants)
+    └── lib/
+        ├── models/            # Dart classes mirroring backend Pydantic schemas
+        ├── services/          # ApiClient — http calls to the FastAPI backend
+        ├── providers/         # ChangeNotifier state (Provider package)
+        ├── screens/           # Home, Schedule, Standings, News, Tickets, detail pages
+        ├── utils/             # Formatting, team colours, chart palette
+        └── widgets/           # AdaptiveNavScaffold, shared UI pieces
 ```
 
 ## Prerequisites
@@ -155,10 +153,9 @@ The backend URL is resolved automatically in
   flutter run --dart-define=API_BASE_URL=http://192.168.1.23:8000
   ```
 
-Currently only the **Home** screen calls the backend (`GET /api/races/{season}`,
-filtered to upcoming races). Schedule, Standings, News, and Tickets are
-wired into navigation but show a "coming soon" placeholder — see
-`mobile_app/lib/screens/` for where to fill each one in.
+> **Note:** the app needs the backend running to show data. If every screen
+> shows "Couldn't load this", check that `uvicorn` is up on port 8000 and
+> that Postgres is running (`docker compose ps`).
 
 ## Database migrations
 
@@ -181,9 +178,12 @@ alembic upgrade head
 | `GET /api/races?season=2024` | Read-only listing straight from Postgres, no Jolpica call |
 | `GET /api/standings/drivers/{season}` | Driver standings |
 | `GET /api/standings/constructors/{season}` | Constructor standings |
+| `GET /api/standings/progression/{season}` | Cumulative points per round, for the season progression chart |
 | `GET /api/circuits/{circuit_ref}/history` | Last winner + recent fastest lap at a circuit (for upcoming-race pages) |
 | `GET /api/drivers` / `GET /api/constructors` | Read-only listings from Postgres |
-| `GET /api/news` | Placeholder — static stub data for now |
+| `GET /api/drivers/{driver_ref}` | Driver bio, career totals, recent results |
+| `GET /api/constructors/{constructor_ref}` | Constructor info, career wins, recent results |
+| `GET /api/news` | Latest F1 headlines from a public RSS feed (no API key) |
 
 ## Driver photos
 
@@ -206,8 +206,17 @@ docstring in `client.py` for the intended approach (own tables, own sync
 functions, own router) so it can be plugged in without touching the
 existing schedule/standings code.
 
-## Future: real news integration
+## News
 
-`backend/app/routers/news.py` currently returns static placeholder data.
-`NEWS_API_KEY` is already reserved in `.env.example` for whichever news
-provider gets picked later.
+`GET /api/news` serves live F1 headlines parsed from a public RSS feed
+(motorsport.com by default, set via `NEWS_FEED_URL`) — no API key or
+signup required, so the news section works out of the box. Responses are
+cached in-process for `NEWS_CACHE_TTL_SECONDS`. `NEWS_API_KEY` stays
+reserved in `.env.example` in case you later swap in a keyed provider.
+
+## No API keys required
+
+Every data source this project uses is free and key-free — Jolpica,
+Wikipedia, the news RSS feed, and the bundled track diagrams. Clone it,
+copy `.env.example`, and it runs. The `SPORTRADAR_API_KEY` / `NEWS_API_KEY`
+slots are placeholders for optional future integrations and can stay empty.
