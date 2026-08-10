@@ -6,13 +6,35 @@ front end and a **FastAPI + PostgreSQL** backend.
 
 Runs from a single codebase on **Android, iOS, Windows and macOS**.
 
-<!-- SCREENSHOTS: add 2-4 images here, e.g.
 <p align="center">
-  <img src="docs/screenshots/home.png" width="30%">
-  <img src="docs/screenshots/schedule.png" width="30%">
-  <img src="docs/screenshots/race-detail.png" width="30%">
+  <img src="docs/screenshots/home.png" width="90%" alt="Home screen showing a live countdown to the next race and the upcoming rounds">
 </p>
--->
+
+<p align="center">
+  <img src="docs/screenshots/race-detail.png" width="90%" alt="Race detail page with track outline diagram, circuit map and full race classification">
+</p>
+
+<details>
+<summary><b>More screenshots</b></summary>
+<br>
+
+<p align="center">
+  <img src="docs/screenshots/schedule.png" width="90%" alt="Season schedule as a card grid with podium previews">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/standings.png" width="90%" alt="Driver championship standings">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/chart.png" width="90%" alt="Season points progression chart">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/news.png" width="90%" alt="F1 news feed with headlines and images">
+</p>
+
+</details>
 
 ## Features
 
