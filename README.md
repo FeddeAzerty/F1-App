@@ -45,29 +45,6 @@ front of them, normalises the data into its own schema, and caches it in Postgre
 ```
 Flutter app  ─►  FastAPI  ─►  Postgres cache ─► (miss) ─► Jolpica / Wikipedia / RSS
 ```
-
-A few decisions worth calling out:
-
-**Caching around a rate limit.** Jolpica is volunteer-run with a 200 req/hour cap
-and no uptime guarantee. Every response is cached in a `jolpica_cache` table with a
-configurable TTL, and parsed into normalised tables (`races`, `drivers`,
-`race_results`, and so on). The app keeps working from cached data when the upstream
-is slow or briefly down.
-
-**Bulk endpoints over N+1 requests.** Showing podium previews for a whole season
-would mean roughly 24 API calls. `/api/races/{season}/podiums` fetches the season in
-a handful of paginated upstream requests instead, then serves it from Postgres.
-
-**Results are gated on race date, not data presence.** The upstream dataset can
-carry projected results for races that haven't happened yet, so the app treats a
-race as completed only once its start time has passed. Otherwise every future round
-would display a fabricated podium.
-
-**Driver photos are resolved once, then cached permanently.** There's no free API
-for official F1 headshots, so the backend resolves each driver's Wikipedia photo and
-stores the URL. A null column means "not looked up"; an empty string means "looked
-up, none exists", so drivers without photos aren't retried forever.
-
 ## Running locally
 
 **Requires** Docker, Python 3.11+, and Flutter 3.32+.
@@ -153,7 +130,5 @@ mobile_app/
 
 - Jolpica is a free, volunteer-run service, so its data is best-effort. The caching
   layer above exists precisely because of that.
-- `backend/app/services/sportradar/` is a deliberate stub, structured so a paid
-  timing-data provider could be added without touching existing code.
 - Track diagrams are from [f1db](https://github.com/f1db/f1db), licensed
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
