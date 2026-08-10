@@ -58,11 +58,16 @@ class _NewsScreenState extends State<NewsScreen> {
                 }
                 return RefreshIndicator(
                   onRefresh: provider.load,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(12),
-                    itemCount: provider.articles.length,
-                    itemBuilder: (context, i) =>
-                        _NewsCard(article: provider.articles[i]),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 900),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(12),
+                        itemCount: provider.articles.length,
+                        itemBuilder: (context, i) =>
+                            _NewsCard(article: provider.articles[i]),
+                      ),
+                    ),
                   ),
                 );
             }
@@ -99,8 +104,9 @@ class _NewsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (article.imageUrl != null)
-              AspectRatio(
-                aspectRatio: 16 / 9,
+              SizedBox(
+                height: 200,
+                width: double.infinity,
                 child: Image.network(
                   article.imageUrl!,
                   fit: BoxFit.cover,

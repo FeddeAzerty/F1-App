@@ -26,8 +26,8 @@ class StandingsChart extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AspectRatio(
-          aspectRatio: 1.5,
+        SizedBox(
+          height: 380,
           child: LineChart(
             LineChartData(
               minX: rounds.first.toDouble(),

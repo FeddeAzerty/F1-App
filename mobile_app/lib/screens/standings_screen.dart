@@ -178,7 +178,12 @@ class _ChartBody extends StatelessWidget {
       case LoadStatus.loaded:
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          child: StandingsChart(progression: provider.progression!),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1100),
+              child: StandingsChart(progression: provider.progression!),
+            ),
+          ),
         );
     }
   }
