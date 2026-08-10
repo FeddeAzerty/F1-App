@@ -157,6 +157,58 @@ The backend URL is resolved automatically in
 > shows "Couldn't load this", check that `uvicorn` is up on port 8000 and
 > that Postgres is running (`docker compose ps`).
 
+## Deploying the backend (free)
+
+The Flutter app is only a UI — it needs this API reachable to show anything.
+To hand someone a build that works without them running a server, deploy the
+backend and point the app at that URL.
+
+Recommended free combination:
+
+| Piece | Service | Why |
+|---|---|---|
+| Database | [Neon](https://neon.com) | Permanent free Postgres — no expiry |
+| API | [Render](https://render.com) | Free Docker web service |
+
+> Render also offers free Postgres, but it **expires after 30 days** — your
+> demo would silently die a month later. Neon's free tier doesn't expire.
+
+**Steps**
+
+1. **Neon** — create a project, copy the connection string (looks like
+   `postgres://user:pass@ep-xxx.neon.tech/neondb?sslmode=require`).
+   The app rewrites the `postgres://` scheme for SQLAlchemy automatically.
+2. **Render** — New → Blueprint, pick this repo. `render.yaml` configures the
+   service; paste the Neon string as the `DATABASE_URL` env var when prompted.
+3. Deploy. Migrations run automatically on container start
+   (`alembic upgrade head`), so the schema builds itself on first boot.
+4. Check `https://<your-service>.onrender.com/api/health` returns
+   `{"status":"ok"}`.
+
+**Free-tier caveats (worth knowing before sharing a link):**
+
+- Render free services **sleep after 15 minutes idle**; the next request takes
+  ~1 minute to wake. First load after a quiet period feels slow.
+- Neon scales to zero too, adding a second or two on a cold start.
+- After first use, data is cached in Postgres, so subsequent loads are fast.
+
+## Building a distributable app
+
+Point a release build at your deployed API with `--dart-define`:
+
+```bash
+cd mobile_app
+flutter build windows --release --dart-define=API_BASE_URL=https://<your-service>.onrender.com
+```
+
+The output folder (`build/windows/x64/runner/Release/`) contains the `.exe`
+plus its DLLs — zip the whole folder to distribute it. Without the
+`--dart-define`, the build defaults to `localhost:8000` and only works
+alongside a locally running backend.
+
+Swap `windows` for `apk` (Android) or `macos` — note macOS/iOS builds require
+a Mac.
+
 ## Database migrations
 
 Schema changes go through Alembic. After editing a model in
