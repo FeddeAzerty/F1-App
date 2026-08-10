@@ -25,7 +25,6 @@ app.include_router(constructors.router)
 app.include_router(circuits.router)
 app.include_router(news.router)
 
-
 @app.get("/api/health")
 def health_check():
     return {"status": "ok"}

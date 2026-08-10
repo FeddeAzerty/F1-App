@@ -6,7 +6,6 @@ from app.schemas.circuit import CircuitOut
 from app.schemas.constructor import ConstructorOut
 from app.schemas.driver import DriverOut
 
-
 class RaceResultOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -25,7 +24,6 @@ class RaceResultOut(BaseModel):
     driver: DriverOut
     constructor: ConstructorOut
 
-
 class RaceOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -42,7 +40,6 @@ class RaceOut(BaseModel):
     qualifying_at: datetime | None
     sprint_at: datetime | None
     sprint_qualifying_at: datetime | None
-
 
 class RaceDetailOut(RaceOut):
     results: list[RaceResultOut] = []

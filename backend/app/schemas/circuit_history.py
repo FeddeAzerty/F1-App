@@ -5,11 +5,7 @@ from pydantic import BaseModel
 from app.schemas.constructor import ConstructorOut
 from app.schemas.driver import DriverOut
 
-
 class CircuitHistoryOut(BaseModel):
-    """Last winner + fastest lap among recent races at a circuit (not a
-    literal all-time record - see sync_circuit_history for why). Shown on
-    upcoming race pages in place of results that don't exist yet."""
 
     has_data: bool
 

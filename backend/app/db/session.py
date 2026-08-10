@@ -8,9 +8,7 @@ from app.core.config import settings
 engine = create_engine(settings.database_url, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
 def get_db() -> Generator[Session, None, None]:
-    """FastAPI dependency that yields a DB session and always closes it."""
     db = SessionLocal()
     try:
         yield db

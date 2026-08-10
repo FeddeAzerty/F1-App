@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import '../models/race.dart';
 import '../utils/date_format.dart';
 
-/// Practice/Qualifying/Sprint/Race session times for the weekend - fills
-/// out what would otherwise be a near-empty page for races that haven't
-/// happened yet (no results to show).
 class WeekendSchedule extends StatelessWidget {
   const WeekendSchedule({super.key, required this.race});
 

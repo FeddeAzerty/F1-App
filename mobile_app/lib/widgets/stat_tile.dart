@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../utils/theme_ext.dart';
 
-/// A single labelled stat (big value over a small caption) for detail
-/// pages - career wins, race entries, etc.
 class StatTile extends StatelessWidget {
   const StatTile({super.key, required this.label, required this.value});
 

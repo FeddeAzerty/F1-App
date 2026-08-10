@@ -6,9 +6,6 @@ import '../utils/country_flags.dart';
 import '../utils/date_format.dart';
 import 'driver_avatar.dart';
 
-/// F1.com-style results table: one row per race, showing the winner.
-/// Expects each [RaceDetail.results] to be a podium (sorted by position) -
-/// `results.first` is treated as the winner.
 class ResultsTable extends StatelessWidget {
   const ResultsTable({super.key, required this.races, this.onRaceTap});
 
@@ -17,9 +14,7 @@ class ResultsTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Require the race to have actually run, not just to have result data -
-    // the data source carries projected results for future races (see
-    // RaceGridCard), which shouldn't appear as completed results here.
+
     final rows = races.where((r) => r.results.isNotEmpty && r.race.isPast).toList()
       ..sort((a, b) => a.race.round.compareTo(b.race.round));
 

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// A shimmering placeholder block, for loading states that mimic the shape
-/// of the content that's coming (cards, rows) instead of a bare spinner.
 class SkeletonBox extends StatefulWidget {
   const SkeletonBox({
     super.key,
@@ -48,7 +46,6 @@ class _SkeletonBoxState extends State<SkeletonBox>
   }
 }
 
-/// A grid of skeleton cards matching the schedule grid layout.
 class SkeletonCardGrid extends StatelessWidget {
   const SkeletonCardGrid({super.key, this.count = 6});
 
@@ -90,8 +87,6 @@ class SkeletonCardGrid extends StatelessWidget {
   }
 }
 
-/// A vertical list of skeleton rows, for list-shaped loading states
-/// (standings, results, news).
 class SkeletonList extends StatelessWidget {
   const SkeletonList({super.key, this.count = 8});
 

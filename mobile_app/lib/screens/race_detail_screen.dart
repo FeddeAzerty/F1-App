@@ -29,12 +29,8 @@ class RaceDetailScreen extends StatelessWidget {
   final int season;
   final int round;
 
-  /// Shown in the AppBar immediately, before the detail request resolves -
-  /// avoids a blank title while loading since we already know it from the
-  /// race list that got us here.
   final String raceNameFallback;
 
-  /// Overridable for tests; defaults to the real backend client.
   final ApiClient? apiClient;
 
   @override
@@ -77,9 +73,7 @@ class _Body extends StatelessWidget {
       case LoadStatus.loaded:
         final detail = provider.detail!;
         final circuit = detail.race.circuit;
-        // Treat a future race as having no results even if the data source
-        // supplied projected ones (see RaceGridCard) - so upcoming races
-        // show the "At this circuit" history instead of a fake result.
+
         final hasRun = detail.race.isPast && detail.results.isNotEmpty;
         final winner = hasRun
             ? detail.results.firstWhere(
@@ -98,11 +92,7 @@ class _Body extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // The track outline stays the prominent top visual when
-                  // available; the live map moves down into the info row
-                  // below instead of being replaced. Circuits without a
-                  // track diagram use the live map as the top visual
-                  // instead, since showing it twice would be redundant.
+
                   if (hasDiagram)
                     CircuitTrackDiagram(circuitRef: circuit.circuitRef)
                   else
@@ -174,8 +164,7 @@ class _Body extends StatelessWidget {
                 ),
               ),
             ] else ...[
-              // Upcoming race - no results of its own yet, so show what's
-              // happened at this circuit before instead of an empty page.
+
               const SizedBox(height: 24),
               Text(
                 'At this circuit',
@@ -249,9 +238,7 @@ class _WinnerBanner extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        // Full race duration (H:MM:SS), not a single lap -
-                        // easy to mistake for one next to the much smaller
-                        // fastest-lap time below without this label.
+
                         'RACE TIME',
                         style: TextStyle(
                           fontSize: 10,
@@ -311,9 +298,6 @@ class _WinnerBanner extends StatelessWidget {
   }
 }
 
-/// Loads and shows circuit history for an upcoming race. Owns its own
-/// provider so the (potentially slow, cold-cache) history fetch only fires
-/// when a race actually has no results, not on every race-detail open.
 class _CircuitHistorySection extends StatelessWidget {
   const _CircuitHistorySection({required this.circuitRef});
 

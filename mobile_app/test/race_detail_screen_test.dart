@@ -74,9 +74,7 @@ void main() {
   testWidgets('renders circuit and results from injected data, no network', (
     tester,
   ) async {
-    // Tall viewport so every result row is mounted (a plain ListView still
-    // only builds elements within the viewport + cache extent) rather than
-    // needing to scroll to find off-screen rows.
+
     tester.view.physicalSize = const Size(800, 2400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
@@ -97,7 +95,6 @@ void main() {
       ),
     );
 
-    // Avoid pumpAndSettle: the embedded map can keep scheduling frames.
     for (var i = 0; i < 5; i++) {
       await tester.pump(const Duration(milliseconds: 100));
     }
@@ -105,13 +102,11 @@ void main() {
     expect(find.text('Albert Park Grand Prix Circuit'), findsOneWidget);
     expect(find.text('Melbourne, Australia'), findsOneWidget);
 
-    // Winner banner
     expect(find.text('Winner'), findsOneWidget);
-    // Winner's finish time appears twice: banner + results list row.
+
     expect(find.text('1:23:06.801'), findsNWidgets(2));
     expect(find.textContaining('Fastest lap: George Russell'), findsOneWidget);
 
-    // Winner appears twice: once in the banner, once in the results list.
     expect(find.text('George Russell'), findsNWidgets(2));
     expect(find.text('Max Verstappen'), findsOneWidget);
     expect(find.text('+2.974'), findsOneWidget);

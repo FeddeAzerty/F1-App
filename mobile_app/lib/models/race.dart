@@ -1,9 +1,5 @@
 import 'circuit.dart';
 
-/// Parses a backend datetime string (naive, always UTC) as UTC - plain
-/// `DateTime.parse` would otherwise interpret a string with no offset/`Z`
-/// suffix as local time, silently shifting session times by the device's
-/// timezone offset.
 DateTime? _parseUtc(dynamic value) {
   if (value == null) return null;
   return DateTime.parse('${value as String}Z');
@@ -31,16 +27,10 @@ class Race {
   final String raceName;
   final DateTime raceDate;
 
-  /// Race start time as returned by the API, "HH:MM:SS" in UTC. Kept as a
-  /// raw string and only parsed when combined with [raceDate] below - the
-  /// API omits it for races without a confirmed start time.
   final String? raceTime;
   final String? url;
   final Circuit circuit;
 
-  // Weekend session schedule, all UTC. Sprint/SprintQualifying are only
-  // set on sprint weekends; all are null until a schedule sync has run for
-  // this race (see backend's sync_season_schedule vs sync_race).
   final DateTime? firstPracticeAt;
   final DateTime? secondPracticeAt;
   final DateTime? thirdPracticeAt;
@@ -68,8 +58,6 @@ class Race {
     );
   }
 
-  /// [raceDate] + [raceTime] combined into a single UTC instant, for
-  /// sorting and for deciding whether a race is still upcoming.
   DateTime get startAtUtc {
     if (raceTime == null) {
       return DateTime.utc(raceDate.year, raceDate.month, raceDate.day);

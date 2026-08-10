@@ -1,9 +1,6 @@
 import 'constructor.dart';
 import 'driver.dart';
 
-/// Last winner + recent fastest lap at a circuit (see backend
-/// CircuitHistoryOut). Shown on upcoming race pages, which have no results
-/// of their own yet.
 class CircuitHistory {
   const CircuitHistory({
     required this.hasData,

@@ -1,11 +1,3 @@
-"""Parses Jolpica API payloads and upserts them into our normalized tables.
-
-Each `sync_*` function fetches the relevant Jolpica endpoint (via
-`client.fetch_json`, which handles caching) and writes the result into
-Postgres so the rest of the app reads from our own DB rather than Jolpica
-directly on every request.
-"""
-
 from datetime import date, datetime, time
 
 from sqlalchemy.orm import Session
@@ -18,20 +10,15 @@ from app.models.standings import ConstructorStanding, DriverStanding
 from app.services.jolpica.client import fetch_all_races, fetch_json, fetch_recent_circuit_races
 from app.services.wikipedia.client import fetch_driver_photo_url
 
-
 def _parse_date(value: str | None) -> date | None:
     return datetime.strptime(value, "%Y-%m-%d").date() if value else None
-
 
 def _parse_time(value: str | None) -> time | None:
     if not value:
         return None
     return datetime.strptime(value.rstrip("Z"), "%H:%M:%S").time()
 
-
 def _parse_lap_time_seconds(value: str | None) -> float | None:
-    """Parses a lap time string ("1:22.670" or, rarely, just "58.123")
-    into total seconds, so lap times can be compared numerically."""
     if not value:
         return None
     parts = value.split(":")
@@ -42,11 +29,7 @@ def _parse_lap_time_seconds(value: str | None) -> float | None:
     except ValueError:
         return None
 
-
 def _parse_session(session_json: dict | None) -> datetime | None:
-    """Combines a Jolpica session block (e.g. Qualifying: {date, time}) into
-    a single UTC datetime. Absent for sessions that don't apply to a given
-    weekend (e.g. Sprint on a non-sprint weekend)."""
     if not session_json:
         return None
     d = _parse_date(session_json.get("date"))
@@ -54,7 +37,6 @@ def _parse_session(session_json: dict | None) -> datetime | None:
     if d is None:
         return None
     return datetime.combine(d, t or time())
-
 
 def _upsert_circuit(db: Session, circuit_json: dict) -> Circuit:
     circuit = db.query(Circuit).filter(Circuit.circuit_ref == circuit_json["circuitId"]).one_or_none()
@@ -71,7 +53,6 @@ def _upsert_circuit(db: Session, circuit_json: dict) -> Circuit:
     circuit.url = circuit_json.get("url")
     db.flush()
     return circuit
-
 
 def _upsert_driver(db: Session, driver_json: dict, *, resolve_photo: bool = True) -> Driver:
     driver = db.query(Driver).filter(Driver.driver_ref == driver_json["driverId"]).one_or_none()
@@ -90,30 +71,18 @@ def _upsert_driver(db: Session, driver_json: dict, *, resolve_photo: bool = True
     driver.url = driver_json.get("url")
     db.flush()
 
-    # resolve_photo=False skips the Wikipedia round-trip for this upsert
-    # (used when bulk-upserting many historical drivers who mostly won't
-    # end up shown anywhere - see sync_circuit_history, which resolves
-    # photos only for the couple of drivers it actually returns).
     if resolve_photo:
         _ensure_driver_photo(db, driver)
 
     return driver
 
-
 def _ensure_driver_photo(db: Session, driver: Driver) -> None:
-    """Resolved once per driver - photo_url stays "" only once Wikipedia
-    has positively confirmed there's no photo; an inconclusive lookup
-    (None - network error, or Wikimedia's edge blocking us as bot traffic,
-    which happens intermittently - see wikipedia/client.py) leaves it NULL
-    so it's retried later instead of being cached as a permanent "no
-    photo" answer."""
     if driver.photo_url is not None or not driver.url:
         return
     photo = fetch_driver_photo_url(driver.url)
     if photo is not None:
         driver.photo_url = photo
         db.flush()
-
 
 def _upsert_constructor(db: Session, constructor_json: dict) -> Constructor:
     constructor = (
@@ -129,11 +98,7 @@ def _upsert_constructor(db: Session, constructor_json: dict) -> Constructor:
     db.flush()
     return constructor
 
-
 def _apply_result_timing(result: RaceResult, result_json: dict) -> None:
-    """Parses the `Time` (race-winner elapsed time / gap-to-leader for other
-    classified finishers) and `FastestLap` blocks from a Jolpica result
-    entry. Both are absent for retirements/DNFs."""
     time_json = result_json.get("Time") or {}
     result.finish_time_millis = int(time_json["millis"]) if time_json.get("millis") else None
     result.finish_time = time_json.get("time")
@@ -149,10 +114,7 @@ def _apply_result_timing(result: RaceResult, result_json: dict) -> None:
     speed_json = fastest_lap_json.get("AverageSpeed") or {}
     result.fastest_lap_speed_kph = float(speed_json["speed"]) if speed_json.get("speed") else None
 
-
 def _upsert_race_schedule(db: Session, season: int, race_json: dict) -> Race:
-    """Upserts a Race + its Circuit from a Jolpica race entry that only has
-    schedule info (no Results key, or an entry from the schedule endpoint)."""
     circuit = _upsert_circuit(db, race_json["Circuit"])
     round_ = int(race_json["round"])
 
@@ -167,11 +129,6 @@ def _upsert_race_schedule(db: Session, season: int, race_json: dict) -> Race:
     race.race_time = _parse_time(race_json.get("time"))
     race.url = race_json.get("url")
 
-    # The results endpoint's race entries don't include session times at
-    # all (no FirstPractice/Qualifying/etc. keys) - only touch these
-    # columns when the source payload actually has the key, so syncing
-    # results after a schedule sync doesn't wipe out session data that's
-    # only available from the schedule endpoint.
     if "FirstPractice" in race_json:
         race.first_practice_at = _parse_session(race_json.get("FirstPractice"))
     if "SecondPractice" in race_json:
@@ -187,7 +144,6 @@ def _upsert_race_schedule(db: Session, season: int, race_json: dict) -> Race:
 
     db.flush()
     return race
-
 
 def _upsert_result(db: Session, race: Race, result_json: dict, *, resolve_photo: bool = True) -> RaceResult:
     driver = _upsert_driver(db, result_json["Driver"], resolve_photo=resolve_photo)
@@ -212,9 +168,7 @@ def _upsert_result(db: Session, race: Race, result_json: dict, *, resolve_photo:
     _apply_result_timing(result, result_json)
     return result
 
-
 def sync_season_schedule(db: Session, season: int) -> list[Race]:
-    """Fetch and upsert the full race schedule for `season`."""
     payload = fetch_json(db, f"{season}.json")
     races_json = payload["MRData"]["RaceTable"]["Races"]
 
@@ -224,14 +178,7 @@ def sync_season_schedule(db: Session, season: int) -> list[Race]:
     races.sort(key=lambda r: r.round)
     return races
 
-
 def sync_race(db: Session, season: int, round_: int) -> Race | None:
-    """Fetch and upsert a single race, including results if Jolpica has
-    published them. Races that haven't happened yet (or whose results
-    aren't published) have no `Results` key - those fall back to
-    schedule-only info instead of 404ing, so upcoming races are still
-    viewable before the results endpoint has anything to say.
-    """
     results_payload = fetch_json(db, f"{season}/{round_}/results.json")
     races_json = results_payload["MRData"]["RaceTable"]["Races"]
 
@@ -255,17 +202,7 @@ def sync_race(db: Session, season: int, round_: int) -> Race | None:
     db.refresh(race)
     return race
 
-
 def sync_season_podiums(db: Session, season: int) -> list[Race]:
-    """Fetch and upsert the top-3 finishers for every race in a season that
-    has results published, using paginated whole-season requests
-    (`fetch_all_races`) instead of one Jolpica call per race - built for
-    views that need a season's worth of "who's on the podium" at once
-    (e.g. a schedule grid) without a request per card.
-
-    Only upserts podium (P1-P3) results; a race's full result list is
-    still fetched lazily via `sync_race` when its detail screen is opened.
-    """
     races_json = fetch_all_races(db, f"{season}/results.json")
 
     races: list[Race] = []
@@ -282,29 +219,7 @@ def sync_season_podiums(db: Session, season: int) -> list[Race]:
     races.sort(key=lambda r: r.round)
     return races
 
-
 def sync_circuit_history(db: Session, circuit_ref: str) -> dict:
-    """Fetches the circuit's recent races (see fetch_recent_circuit_races -
-    bounded, not full history), upserts them into our normal races/results
-    tables, and derives two facts: who won the most recent race held
-    there, and the fastest lap among the races fetched. Built for
-    upcoming-race pages, which otherwise have nothing to show.
-
-    "Fastest lap" here means "fastest in the recent races we fetched," not
-    a literal all-time record back to a circuit's first Grand Prix -
-    intentionally, both for cost (resolving driver photos for 40-year-old
-    entries made this endpoint take over a minute in testing) and honesty
-    (old eras had very different cars, and many circuits have been
-    reprofiled enough that an old lap time isn't really comparable to the
-    current layout anyway).
-
-    Driver photos are deliberately skipped during the bulk scan below
-    (`resolve_photo=False`) - most of the ~15-20 races' worth of drivers
-    scanned here never end up shown anywhere. Only the 2 drivers actually
-    returned (last winner, lap record holder) get their photo resolved,
-    which is what made this endpoint take 90+ seconds down to ~2-3s in
-    testing.
-    """
     races_json = fetch_recent_circuit_races(db, circuit_ref)
     if not races_json:
         return {"last_race": None, "last_winner": None, "lap_record": None}
@@ -349,7 +264,6 @@ def sync_circuit_history(db: Session, circuit_ref: str) -> dict:
         "lap_record": lap_record_result,
     }
 
-
 def sync_driver_standings(db: Session, season: int) -> list[DriverStanding]:
     payload = fetch_json(db, f"{season}/driverStandings.json")
     standings_lists = payload["MRData"]["StandingsTable"]["StandingsLists"]
@@ -383,7 +297,6 @@ def sync_driver_standings(db: Session, season: int) -> list[DriverStanding]:
     standings.sort(key=lambda s: (s.position is None, s.position))
     return standings
 
-
 def sync_constructor_standings(db: Session, season: int) -> list[ConstructorStanding]:
     payload = fetch_json(db, f"{season}/constructorStandings.json")
     standings_lists = payload["MRData"]["StandingsTable"]["StandingsLists"]
@@ -413,7 +326,6 @@ def sync_constructor_standings(db: Session, season: int) -> list[ConstructorStan
     standings.sort(key=lambda s: (s.position is None, s.position))
     return standings
 
-
 def _result_summary(race_json: dict, result_json: dict) -> dict:
     position = result_json.get("position")
     return {
@@ -425,11 +337,7 @@ def _result_summary(race_json: dict, result_json: dict) -> dict:
         "points": float(result_json.get("points", 0)),
     }
 
-
 def sync_driver_detail(db: Session, driver_ref: str) -> dict | None:
-    """Bio + career totals + recent results for one driver, from Jolpica's
-    driver-scoped endpoints (a handful of cached calls). Returns None if
-    the driver isn't found."""
     bio_payload = fetch_json(db, f"drivers/{driver_ref}.json")
     drivers_json = bio_payload["MRData"]["DriverTable"]["Drivers"]
     if not drivers_json:
@@ -437,8 +345,6 @@ def sync_driver_detail(db: Session, driver_ref: str) -> dict | None:
     driver = _upsert_driver(db, drivers_json[0])
     db.commit()
 
-    # Ergast/Jolpica support filtering results by finishing position, so
-    # career wins is just the total of the position-1 result set.
     wins_payload = fetch_json(db, f"drivers/{driver_ref}/results/1.json?limit=1")
     career_wins = int(wins_payload["MRData"].get("total", 0))
 
@@ -453,7 +359,7 @@ def sync_driver_detail(db: Session, driver_ref: str) -> dict | None:
         for race_json in recent_races
         if race_json.get("Results")
     ]
-    recent.reverse()  # most recent first
+    recent.reverse()
 
     return {
         "driver": driver,
@@ -462,19 +368,14 @@ def sync_driver_detail(db: Session, driver_ref: str) -> dict | None:
         "recent": recent,
     }
 
-
 def _is_better_position(a: dict, b: dict) -> bool:
-    """True if result `a` finished ahead of `b` (a numeric position beats
-    None; lower number is better)."""
     if a["position"] is None:
         return False
     if b["position"] is None:
         return True
     return a["position"] < b["position"]
 
-
 def sync_constructor_detail(db: Session, constructor_ref: str) -> dict | None:
-    """Info + career race wins + recent results for one constructor."""
     info_payload = fetch_json(db, f"constructors/{constructor_ref}.json")
     constructors_json = info_payload["MRData"]["ConstructorTable"]["Constructors"]
     if not constructors_json:
@@ -493,8 +394,6 @@ def sync_constructor_detail(db: Session, constructor_ref: str) -> dict | None:
     )
     recent_races = recent_payload["MRData"]["RaceTable"]["Races"]
 
-    # A constructor fields two cars per race; keep the team's best finish
-    # in each of the most recent races rather than a single result.
     by_round: dict[tuple[int, int], dict] = {}
     for race_json in recent_races:
         for result_json in race_json.get("Results", []):
@@ -508,17 +407,7 @@ def sync_constructor_detail(db: Session, constructor_ref: str) -> dict | None:
 
     return {"constructor": constructor, "career_wins": career_wins, "recent": recent}
 
-
 def sync_standings_progression(db: Session, season: int) -> dict:
-    """Cumulative championship points per driver after each round of a
-    season, for a progression line chart. Computed from one bulk
-    whole-season results fetch (already cached), so it's a single Jolpica
-    round-trip rather than one call per round.
-
-    Note: this sums *race* points only - sprint-race points (a separate
-    Jolpica endpoint) aren't included, so totals for sprint weekends are a
-    slight underestimate. Good enough for a season-shape visualization.
-    """
     races_json = fetch_all_races(db, f"{season}/results.json")
     if not races_json:
         return {"rounds": [], "drivers": []}
@@ -536,8 +425,6 @@ def sync_standings_progression(db: Session, season: int) -> dict:
             ref = driver_json["driverId"]
             names.setdefault(ref, driver_json.get("code") or driver_json["familyName"])
             running[ref] = running.get(ref, 0.0) + float(result_json.get("points", 0))
-        # Everyone who's scored carries their total forward, so every series
-        # has a value at every round (a flat segment where they didn't score).
         for ref in running:
             series.setdefault(ref, [0.0] * len(rounds))
             series[ref][idx] = running[ref]

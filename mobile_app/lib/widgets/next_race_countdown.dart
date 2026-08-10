@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import '../models/race.dart';
 import '../utils/country_flags.dart';
 
-/// A live-ticking countdown banner to the next race's start. Ticks once a
-/// second via its own timer (stopped on dispose).
 class NextRaceCountdown extends StatefulWidget {
   const NextRaceCountdown({super.key, required this.race, this.onTap});
 

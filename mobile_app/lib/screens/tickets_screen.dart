@@ -4,8 +4,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../utils/theme_ext.dart';
 import '../widgets/theme_toggle_button.dart';
 
-/// Static outbound links to official F1 ticket vendors. No data integration
-/// by design - just curated links, opened in the system browser.
 class TicketsScreen extends StatelessWidget {
   const TicketsScreen({super.key});
 

@@ -125,8 +125,6 @@ class _Body extends StatelessWidget {
   }
 }
 
-/// Horizontal strip of the user's favourited drivers, tappable through to
-/// their detail pages. Hidden entirely when there are no favourites.
 class _FavoritesStrip extends StatelessWidget {
   const _FavoritesStrip();
 

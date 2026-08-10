@@ -9,12 +9,10 @@ from app.services.jolpica.sync import sync_constructor_detail
 
 router = APIRouter(prefix="/api/constructors", tags=["constructors"])
 
-
 @router.get("", response_model=list[ConstructorOut])
 def list_constructors(db: Session = Depends(get_db)):
     """Read-only listing from Postgres, populated as a side effect of syncing races/standings."""
     return db.query(Constructor).order_by(Constructor.name).all()
-
 
 @router.get("/{constructor_ref}", response_model=ConstructorDetailOut)
 def get_constructor_detail(constructor_ref: str, db: Session = Depends(get_db)):

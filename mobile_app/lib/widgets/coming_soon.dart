@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Placeholder body for screens whose backend integration hasn't been
-/// built out yet - keeps them navigable while flagging what they'll show.
 class ComingSoon extends StatelessWidget {
   const ComingSoon({super.key, required this.message});
 

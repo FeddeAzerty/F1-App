@@ -1,15 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Driver headshot, resolved in priority order:
-///   1. A bundled override at `assets/drivers/{driver_ref}.png`, if present
-///      (lets you pin a specific image for a driver).
-///   2. `photoUrl` - a network image (Wikipedia headshot resolved by the
-///      backend, see Driver.resolvedPhotoUrl).
-///   3. A generic person icon.
-///
-/// No driver photos ship with this project; the asset override just exists
-/// so you *can* drop one in named by `driver_ref` (e.g.
-/// `max_verstappen.png`) and have it win over the network photo.
 class DriverAvatar extends StatelessWidget {
   const DriverAvatar({
     super.key,
@@ -48,8 +38,7 @@ class DriverAvatar extends StatelessWidget {
       width: radius * 2,
       height: radius * 2,
       fit: BoxFit.cover,
-      // Top-align: headshots are portrait, so cover-cropping to a circle
-      // otherwise cuts off faces at the forehead.
+
       alignment: Alignment.topCenter,
       errorBuilder: (context, error, stackTrace) => _icon(context),
       loadingBuilder: (context, child, progress) =>

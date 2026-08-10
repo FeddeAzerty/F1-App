@@ -21,9 +21,7 @@ class CircuitHistoryProvider extends ChangeNotifier {
       history = await _apiClient.fetchCircuitHistory(circuitRef);
       status = LoadStatus.loaded;
     } on ApiException {
-      // Circuit history is supplementary - if it fails, the race detail
-      // page still shows everything else, so this stays quiet rather than
-      // surfacing an error state of its own.
+
       status = LoadStatus.error;
     }
     notifyListeners();

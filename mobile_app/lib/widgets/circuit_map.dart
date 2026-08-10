@@ -4,10 +4,6 @@ import 'package:latlong2/latlong.dart';
 
 import '../models/circuit.dart';
 
-/// Live map pinned at the circuit's coordinates. Jolpica doesn't provide
-/// track layout images, so this is the "visual" for a circuit - real,
-/// pannable/zoomable, and legally clean (OpenStreetMap tiles) instead of a
-/// static/borrowed image.
 class CircuitMap extends StatelessWidget {
   const CircuitMap({super.key, required this.circuit});
 

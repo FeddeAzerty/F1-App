@@ -4,8 +4,6 @@ import '../models/circuit_history.dart';
 import '../utils/theme_ext.dart';
 import 'driver_avatar.dart';
 
-/// Shown on upcoming-race pages in place of results that don't exist yet:
-/// who won here last time, and the fastest lap among recent races.
 class CircuitHistoryCard extends StatelessWidget {
   const CircuitHistoryCard({super.key, required this.history});
 

@@ -6,14 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
 
-
 class JolpicaCache(Base):
-    """Raw response cache for Jolpica API requests.
-
-    Keyed on the full request URL (including query string) so that repeated
-    calls within `JOLPICA_CACHE_TTL_SECONDS` are served from Postgres instead
-    of counting against Jolpica's 200 req/hour rate limit.
-    """
 
     __tablename__ = "jolpica_cache"
 

@@ -19,16 +19,6 @@ class ApiException implements Exception {
   String toString() => message;
 }
 
-/// Resolves the FastAPI backend's base URL for local development.
-///
-/// Android emulators can't reach the host machine via `localhost` - they
-/// need the special `10.0.2.2` alias instead. iOS simulators and desktop
-/// builds (Windows/macOS) run natively alongside the backend, so
-/// `localhost` works there.
-///
-/// A physical device needs your machine's LAN IP instead of either of
-/// these; override it with:
-///   flutter run --dart-define=API_BASE_URL=http://192.168.1.23:8000
 String resolveApiBaseUrl() {
   const override = String.fromEnvironment('API_BASE_URL');
   if (override.isNotEmpty) return override;
@@ -59,9 +49,6 @@ class ApiClient {
     return RaceDetail.fromJson(data as Map<String, dynamic>);
   }
 
-  /// Top-3 finishers for every race in a season that has results published.
-  /// Same shape as [fetchRaceDetail] (a `RaceDetail` per race) - `results`
-  /// here just means "top 3" rather than the full field.
   Future<List<RaceDetail>> fetchSeasonPodiums(int season) async {
     final data = await _getJson('/api/races/$season/podiums') as List<dynamic>;
     return data
@@ -69,9 +56,6 @@ class ApiClient {
         .toList();
   }
 
-  /// Last winner + recent fastest lap at a circuit. The backend fetches
-  /// historical races on a cold cache, so this can take several seconds
-  /// the first time a circuit is requested - hence the longer timeout.
   Future<CircuitHistory> fetchCircuitHistory(String circuitRef) async {
     final data = await _getJson(
       '/api/circuits/$circuitRef/history',

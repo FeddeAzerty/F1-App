@@ -1,7 +1,3 @@
-/// Jolpica `circuit_ref` values that have a bundled track outline SVG in
-/// `assets/circuits/{circuit_ref}.svg`. Sourced from f1db/f1db (CC BY 4.0) -
-/// see `assets/circuits/LICENSE.md`. Only covers circuits on recent/current
-/// calendars; anything missing here just falls back to the live map.
 const Set<String> circuitsWithTrackMap = {
   'albert_park',
   'shanghai',
@@ -28,9 +24,6 @@ const Set<String> circuitsWithTrackMap = {
   'jeddah',
 };
 
-/// Track outline asset for a circuit. `dark: true` returns the
-/// white-line variant (for dark backgrounds); the default is the
-/// black-line variant. Returns null if we have no diagram for this circuit.
 String? trackMapAssetFor(String circuitRef, {bool dark = false}) {
   if (!circuitsWithTrackMap.contains(circuitRef)) return null;
   return dark

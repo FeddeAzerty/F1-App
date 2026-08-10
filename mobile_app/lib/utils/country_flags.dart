@@ -1,6 +1,3 @@
-/// Maps Jolpica's `country` strings (as used in Circuit.Location) to a flag
-/// emoji. Not exhaustive - anything unmapped falls back to a checkered flag
-/// rather than breaking the layout.
 const Map<String, String> _countryFlags = {
   'Australia': '🇦🇺',
   'China': '🇨🇳',

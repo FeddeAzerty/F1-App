@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Friendly "couldn't load" state - deliberately doesn't surface the raw
-/// exception/request-failure text (e.g. "Request to ... failed with
-/// status 422"), which reads as a developer error message rather than
-/// something a user can act on.
 class ErrorState extends StatelessWidget {
   const ErrorState({super.key, this.onRetry});
 

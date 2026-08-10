@@ -49,7 +49,7 @@ void main() {
         child: MaterialApp(home: StandingsScreen(apiClient: _FakeApiClient())),
       ),
     );
-    await tester.pump(); // let the fake future resolve
+    await tester.pump();
     await tester.pump();
 
     expect(find.text('Oscar Piastri'), findsOneWidget);

@@ -5,11 +5,6 @@ import '../models/progression.dart';
 import '../utils/chart_palette.dart';
 import '../utils/theme_ext.dart';
 
-/// Season championship progression: cumulative points per round for the
-/// leading drivers. A line chart (change-over-time), one line per driver in
-/// fixed categorical-colour order, capped at [maxChartSeries] for legibility
-/// and to stay inside the validated palette range. A legend names each line
-/// so identity never rests on colour alone.
 class StandingsChart extends StatelessWidget {
   const StandingsChart({super.key, required this.progression});
 

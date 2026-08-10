@@ -38,8 +38,7 @@ void main() {
   });
 
   testWidgets('future race hides podium data and shows Upcoming', (tester) async {
-    // Even though podium data is supplied (the data source may carry
-    // projected results), a future-dated race must read as Upcoming.
+
     final race = _race(date: DateTime.now().toUtc().add(const Duration(days: 30)));
     await tester.pumpWidget(
       MaterialApp(home: Scaffold(body: RaceGridCard(race: race, podium: _podium))),

@@ -2,7 +2,6 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-
 class NewsArticleOut(BaseModel):
     title: str
     summary: str

@@ -5,7 +5,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 
-
 class Race(Base):
     __tablename__ = "races"
     __table_args__ = (UniqueConstraint("season", "round", name="uq_race_season_round"),)
@@ -19,9 +18,6 @@ class Race(Base):
     race_time: Mapped[time | None] = mapped_column(Time, nullable=True)
     url: Mapped[str | None] = mapped_column(String(512), nullable=True)
 
-    # Race weekend session schedule (all UTC). Sprint/SprintQualifying are
-    # only present on sprint weekends; SecondPractice/ThirdPractice are
-    # absent on sprint weekends too (the sprint format replaces them).
     first_practice_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     second_practice_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     third_practice_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
@@ -31,7 +27,6 @@ class Race(Base):
 
     circuit: Mapped["Circuit"] = relationship(back_populates="races")
     results: Mapped[list["RaceResult"]] = relationship(back_populates="race", order_by="RaceResult.position")
-
 
 class RaceResult(Base):
     __tablename__ = "race_results"
@@ -48,13 +43,9 @@ class RaceResult(Base):
     laps: Mapped[int | None] = mapped_column(Integer, nullable=True)
     status: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
-    # Race-winner's time is the full elapsed time (e.g. "1:33:56.820");
-    # other classified finishers get a gap to the leader (e.g. "+2.363").
-    # Both are null for retirements/DNFs.
     finish_time_millis: Mapped[int | None] = mapped_column(Integer, nullable=True)
     finish_time: Mapped[str | None] = mapped_column(String(32), nullable=True)
 
-    # Fastest lap of the race has fastest_lap_rank == 1.
     fastest_lap_rank: Mapped[int | None] = mapped_column(Integer, nullable=True)
     fastest_lap_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
     fastest_lap_time: Mapped[str | None] = mapped_column(String(32), nullable=True)

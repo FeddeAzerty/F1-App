@@ -14,7 +14,6 @@ import '../widgets/theme_toggle_button.dart';
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key, this.apiClientProvider});
 
-  /// Test hook: supply a pre-configured provider.
   final NewsProvider? apiClientProvider;
 
   @override

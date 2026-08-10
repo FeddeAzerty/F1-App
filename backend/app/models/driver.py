@@ -5,7 +5,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
 
-
 class Driver(Base):
     __tablename__ = "drivers"
 
@@ -19,10 +18,6 @@ class Driver(Base):
     nationality: Mapped[str | None] = mapped_column(String(128), nullable=True)
     url: Mapped[str | None] = mapped_column(String(512), nullable=True)
 
-    # Resolved once from Wikipedia (see app/services/wikipedia) and cached
-    # here permanently rather than re-fetched every time - NULL means "not
-    # looked up yet", "" means "looked up, no photo found" (so we don't
-    # keep retrying a driver with no available photo).
     photo_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
 
     @property

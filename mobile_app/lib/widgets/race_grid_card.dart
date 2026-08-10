@@ -7,10 +7,6 @@ import '../utils/date_format.dart';
 import '../utils/theme_ext.dart';
 import 'driver_avatar.dart';
 
-/// F1.com-style race card: round + date header, flag + country, race name,
-/// and either a top-3 podium preview (past races) or the weekend's session
-/// times (upcoming races). The next race up gets a highlighted border and
-/// a "NEXT" badge.
 class RaceGridCard extends StatelessWidget {
   const RaceGridCard({
     super.key,
@@ -22,20 +18,14 @@ class RaceGridCard extends StatelessWidget {
 
   final Race race;
 
-  /// Top-3 finishers, sorted by position. Null/empty means the race hasn't
-  /// happened yet (or results aren't published).
   final List<RaceResult>? podium;
 
-  /// Whether this is the next upcoming race on the calendar.
   final bool isNext;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    // Only show a podium once the race has actually run. The data source
-    // can carry projected/simulated results for future races (Jolpica's
-    // 2026 dataset does), so "has results" alone isn't proof it happened -
-    // gate on the race date too, or every future round shows a fake podium.
+
     final showPodium = race.isPast && podium != null && podium!.isNotEmpty;
     final primary = Theme.of(context).colorScheme.primary;
 
@@ -135,9 +125,6 @@ class RaceGridCard extends StatelessWidget {
   }
 }
 
-/// Session times for an upcoming race, filling what would otherwise be an
-/// empty card. Falls back to a plain "Upcoming" pill when session data
-/// hasn't been synced yet.
 class _UpcomingInfo extends StatelessWidget {
   const _UpcomingInfo({required this.race});
 

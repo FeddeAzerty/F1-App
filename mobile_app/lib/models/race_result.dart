@@ -28,13 +28,9 @@ class RaceResult {
   final Driver driver;
   final Constructor constructor;
 
-  /// Full elapsed race time for the winner (e.g. "1:33:56.820"), or the gap
-  /// to the leader for other classified finishers (e.g. "+2.974"). Null for
-  /// retirements/DNFs.
   final int? finishTimeMillis;
   final String? finishTime;
 
-  /// `fastestLapRank == 1` means this driver set the fastest lap of the race.
   final int? fastestLapRank;
   final int? fastestLapNumber;
   final String? fastestLapTime;

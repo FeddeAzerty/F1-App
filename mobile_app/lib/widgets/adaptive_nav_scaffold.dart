@@ -46,9 +46,6 @@ final _destinations = [
   ),
 ];
 
-/// Wraps the five top-level screens in navigation that adapts to window
-/// size: a bottom [NavigationBar] on narrow (mobile) widths, and a side
-/// [NavigationRail] on wide (desktop) widths.
 class AdaptiveNavScaffold extends StatefulWidget {
   const AdaptiveNavScaffold({super.key});
 

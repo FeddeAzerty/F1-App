@@ -9,7 +9,6 @@ from app.services.jolpica.sync import sync_circuit_history
 
 router = APIRouter(prefix="/api/circuits", tags=["circuits"])
 
-
 @router.get("/{circuit_ref}/history", response_model=CircuitHistoryOut)
 def get_circuit_history(circuit_ref: str, db: Session = Depends(get_db)):
     """Last winner + all-time fastest lap at a circuit - built for upcoming

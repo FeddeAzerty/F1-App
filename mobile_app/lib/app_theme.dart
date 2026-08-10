@@ -3,9 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 const f1Red = Color(0xFFE10600);
 
-// Titillium Web is the closest freely-licensed match to F1's own branding
-// typeface - bold, condensed, technical. Used for headings; body text stays
-// on the platform default for readability.
 TextTheme _brandedTextTheme(TextTheme base) {
   return base.copyWith(
     titleLarge: GoogleFonts.titilliumWeb(

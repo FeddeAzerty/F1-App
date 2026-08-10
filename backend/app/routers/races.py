@@ -9,7 +9,6 @@ from app.services.jolpica.sync import sync_race, sync_season_podiums, sync_seaso
 
 router = APIRouter(prefix="/api/races", tags=["races"])
 
-
 @router.get("/{season}", response_model=list[RaceOut])
 def get_season_schedule(season: int, db: Session = Depends(get_db)):
     """Race schedule for a season, cached in Postgres and refreshed from Jolpica as needed.
@@ -22,7 +21,6 @@ def get_season_schedule(season: int, db: Session = Depends(get_db)):
     if not races:
         raise HTTPException(status_code=404, detail=f"No races found for season {season}")
     return races
-
 
 @router.get("/{season}/podiums", response_model=list[RaceDetailOut])
 def get_season_podiums(season: int, db: Session = Depends(get_db)):
@@ -53,7 +51,6 @@ def get_season_podiums(season: int, db: Session = Depends(get_db)):
         for race in races
     ]
 
-
 @router.get("/{season}/{round_}", response_model=RaceDetailOut)
 def get_race_detail(season: int, round_: int, db: Session = Depends(get_db)):
     """Single race, synced from Jolpica on demand. Includes results if
@@ -64,7 +61,6 @@ def get_race_detail(season: int, round_: int, db: Session = Depends(get_db)):
     if race is None:
         raise HTTPException(status_code=404, detail=f"No race found for {season} round {round_}")
     return race
-
 
 @router.get("", response_model=list[RaceOut])
 def list_cached_races(season: int | None = None, db: Session = Depends(get_db)):

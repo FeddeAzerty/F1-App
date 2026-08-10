@@ -20,7 +20,6 @@ enum _StandingsTab { drivers, constructors, chart }
 class StandingsScreen extends StatefulWidget {
   const StandingsScreen({super.key, this.apiClient});
 
-  /// Overridable for tests; defaults to the real backend client.
   final ApiClient? apiClient;
 
   @override
@@ -59,7 +58,7 @@ class _StandingsScreenState extends State<StandingsScreen> {
 
   void _selectTab(_StandingsTab tab) {
     setState(() => _tab = tab);
-    // Progression is loaded lazily the first time the Chart tab is opened.
+
     if (tab == _StandingsTab.chart &&
         _progression.status == LoadStatus.initial) {
       _progression.load(_season);

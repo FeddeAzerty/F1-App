@@ -19,8 +19,7 @@ class RaceResultTile extends StatelessWidget {
 
     return ListTile(
       onTap: onTap,
-      // Team-colour accent bar down the left edge - the broadcast-graphics
-      // convention, and far more scannable than the small dot alone.
+
       leading: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

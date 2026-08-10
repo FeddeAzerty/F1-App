@@ -3,7 +3,6 @@ from pydantic import BaseModel, ConfigDict
 from app.schemas.constructor import ConstructorOut
 from app.schemas.driver import DriverOut
 
-
 class DriverStandingOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -13,7 +12,6 @@ class DriverStandingOut(BaseModel):
     wins: int
     driver: DriverOut
     constructor: ConstructorOut | None
-
 
 class ConstructorStandingOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)

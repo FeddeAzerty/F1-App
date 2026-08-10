@@ -19,9 +19,6 @@ class RaceProvider extends ChangeNotifier {
     return upcoming;
   }
 
-  /// Every race in the loaded season, in calendar order (past and
-  /// upcoming) - for screens that browse a full season rather than just
-  /// what's next.
   List<Race> get races {
     final all = List<Race>.of(_races);
     all.sort((a, b) => a.round.compareTo(b.round));

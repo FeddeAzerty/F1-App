@@ -1,9 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Persists starred drivers and constructors locally (shared_preferences),
-/// so favorites survive app restarts. Kept intentionally simple: two sets
-/// of refs, no backend involvement.
 class FavoritesProvider extends ChangeNotifier {
   static const _driversKey = 'favorite_drivers';
   static const _constructorsKey = 'favorite_constructors';

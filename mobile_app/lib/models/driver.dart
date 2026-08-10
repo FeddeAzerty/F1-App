@@ -20,9 +20,6 @@ class Driver {
   final String? nationality;
   final String? url;
 
-  /// Wikipedia-sourced headshot URL resolved by the backend. Empty string
-  /// (not null) means the backend looked and found none, so treat both
-  /// null and "" as "no photo".
   final String? photoUrl;
 
   String get fullName => '$givenName $familyName';

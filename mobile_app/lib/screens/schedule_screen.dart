@@ -22,9 +22,7 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
-  // Dedicated instances - see the note in the old single-provider version:
-  // the nav shell keeps every tab alive, so Schedule can't share Home's
-  // global RaceProvider without their seasons clobbering each other.
+
   final _raceProvider = RaceProvider();
   final _podiumsProvider = SeasonPodiumsProvider();
 
@@ -104,9 +102,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                       ),
                     ],
                   ),
-                  // Labeled to match F1.com's own Schedule/Results tabs,
-                  // even though here it's a toggle on one screen rather
-                  // than two separate ones.
+
                   SegmentedButton<_ScheduleView>(
                     segments: const [
                       ButtonSegment(
@@ -200,8 +196,6 @@ class _Body extends StatelessWidget {
       );
     }
 
-    // The next race is the earliest one still upcoming - highlighted so
-    // the calendar orients around "what's next" at a glance.
     final nextRace = races
         .where((r) => r.isUpcoming)
         .fold<Race?>(null, (a, b) => a == null || b.round < a.round ? b : a);
